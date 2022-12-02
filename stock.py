@@ -16,7 +16,16 @@ class Stock(Thread):
         if response.status_code == 200:
             soup = BS(response.text, "html.parser")
             div = soup.find("div", {"class": "BNeawe iBp4i AP7Wnd"})
-            price_text = div.text.split(" ")[0]
+            try:
+                price_text = div.text.split(" ")[0]
+                currency = (
+                    soup.find("div", {"class": "BNeawe uEec3 AP7Wnd"})
+                    .text.split("·")[1]
+                    .split(" ")[3]
+                )
+            except AttributeError:
+                price_text = None
+                currency = None
             if price_text:
                 try:
                     self.price = float(
@@ -24,11 +33,6 @@ class Stock(Thread):
                     )
                 except ValueError:
                     self.price = None
-            currency = (
-                soup.find("div", {"class": "BNeawe uEec3 AP7Wnd"})
-                .text.split("·")[1]
-                .split(" ")[3]
-            )
             if currency:
                 self.currency = currency
 
